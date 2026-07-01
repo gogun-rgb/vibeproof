@@ -14,4 +14,4 @@
 3. Add richer MCP config detection.
 4. Add optional signed rule bundles.
 5. Add Docker sandbox experiments behind an explicit disabled-by-default flag.
-
+6. Track and update the transitive Next.js/PostCSS dependency when an upstream compatible fix becomes available.
