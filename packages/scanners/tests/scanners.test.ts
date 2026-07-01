@@ -79,6 +79,46 @@ describe("static scanners", () => {
     }
   });
 
+  it("does not flag project-scoped MCP filesystem paths as broad access", () => {
+    const safePaths = ["./project", "./src", "/workspace/project", "D:\\CodexProjects\\vibeproof"];
+
+    for (const allowedPath of safePaths) {
+      const findings = allFindings(
+        runStaticScanners([
+          {
+            path: ".mcp.json",
+            content: JSON.stringify({ mcpServers: { filesystem: { allowedDirectories: [allowedPath] } } }),
+            size: 80,
+            source: "local"
+          }
+        ])
+      );
+
+      expect(findings.map((finding) => finding.ruleId), allowedPath).not.toContain("MCP_BROAD_FILESYSTEM_HIGH");
+    }
+  });
+
+  it("detects broad MCP filesystem access without treating every slash as risky", () => {
+    const dangerousPaths = ["/", "~", "/home/user", "/Users/name", "/root", "C:\\Users", "%USERPROFILE%", "~/.ssh", ".aws", "AppData"];
+
+    for (const allowedPath of dangerousPaths) {
+      const findings = allFindings(
+        runStaticScanners([
+          {
+            path: ".mcp.json",
+            content: JSON.stringify({ mcpServers: { filesystem: { allowedDirectories: [allowedPath] } } }),
+            size: 80,
+            source: "local"
+          }
+        ])
+      );
+      const broadFinding = findings.find((finding) => finding.ruleId === "MCP_BROAD_FILESYSTEM_HIGH");
+
+      expect(broadFinding, allowedPath).toBeDefined();
+      expect(broadFinding?.scoreContribution).toBe(40);
+    }
+  });
+
   it("masks secret-like evidence", async () => {
     const files = await discoverLocalFiles(path.join(fixturesRoot, "risky-secret"));
     const findings = allFindings(runStaticScanners(files));

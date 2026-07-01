@@ -358,12 +358,15 @@ function agentInstructionScanner(files: SourceFile[]): Finding[] {
   return findings;
 }
 
+const broadMcpFilesystemAccessPattern =
+  /(~(?:[/\\]|$|["'\s,\]}])|%USERPROFILE%|C:\\+Users(?:\\+|$|["'\s,\]}])|\/home(?:\/|$|["'\s,\]}])|\/Users(?:\/|$|["'\s,\]}])|\/root(?:\/|$|["'\s,\]}])|(?:^|["'\s:,])(?:\/)(?=$|["'\s,\]}])|\.ssh|\.aws|browser profile|AppData)/i;
+
 function mcpScanner(files: SourceFile[]): Finding[] {
   const findings: Finding[] = [];
   for (const file of files.filter((candidate) => candidate.path.toLowerCase().includes("mcp"))) {
     const content = file.content;
-    if (/(filesystem|fs).*(\/home|~|%USERPROFILE%|C:\\Users|\/Users|\/root|\/)/i.test(content) || /(\.ssh|\.aws|browser profile|AppData)/i.test(content)) {
-      findings.push(findingForNeedle("MCP_BROAD_FILESYSTEM_HIGH", file, /(\/home|C:\\Users|\/Users|\.ssh|\.aws|AppData|~)/i));
+    if (broadMcpFilesystemAccessPattern.test(content)) {
+      findings.push(findingForNeedle("MCP_BROAD_FILESYSTEM_HIGH", file, broadMcpFilesystemAccessPattern));
     }
     if (/(shell|command|exec|powershell|bash|cmd\.exe)/i.test(content)) {
       findings.push(findingForNeedle("MCP_SHELL_PERMISSION_HIGH", file, /(shell|command|exec|powershell|bash|cmd\.exe)/i));

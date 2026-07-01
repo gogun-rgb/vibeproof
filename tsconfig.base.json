@@ -14,7 +14,7 @@
     "baseUrl": ".",
     "paths": {
       "@vibeproof/ai-providers": ["packages/ai-providers/src/index.ts"],
-      "@vibeproof/cli": ["packages/cli/src/index.ts"],
+      "vibeproof": ["packages/cli/src/index.ts"],
       "@vibeproof/core": ["packages/core/src/index.ts"],
       "@vibeproof/orchestrator": ["packages/orchestrator/src/index.ts"],
       "@vibeproof/report": ["packages/report/src/index.ts"],
@@ -24,4 +24,3 @@
     }
   }
 }
-

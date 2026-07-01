@@ -1,6 +1,6 @@
 # VibeProof Orchestration
 
-The GPT Team Leader owns planning, worker instruction, review, verification, and final approval. Worker output is evidence, not approval.
+The Codex agent owns planning, implementation, review, verification, and final approval. Completion is based on inspected diffs, real command output, and evidence-backed findings.
 
 ## Gate 1 - Design
 
@@ -25,7 +25,7 @@ Excluded:
 - AI-based scoring or AI-based verdicts.
 - Docker sandbox as a required v0.1 feature.
 
-## Worker Result Evidence Contract
+## Result Evidence Contract
 
 Every implementation or review task must report:
 
@@ -40,4 +40,3 @@ Every implementation or review task must report:
 - Remaining limitations
 - Git diff summary
 - Git status
-

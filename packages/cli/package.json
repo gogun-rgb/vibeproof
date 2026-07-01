@@ -1,11 +1,19 @@
 {
-  "name": "@vibeproof/cli",
+  "name": "vibeproof",
   "version": "0.1.0",
+  "description": "Scan before your AI runs it.",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
     "vibeproof": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22"
   },
   "exports": {
     ".": {
@@ -14,13 +22,6 @@
     }
   },
   "scripts": {
-    "build": "tsc -b"
-  },
-  "dependencies": {
-    "@vibeproof/core": "^0.1.0",
-    "@vibeproof/orchestrator": "^0.1.0",
-    "@vibeproof/report": "^0.1.0",
-    "@vibeproof/rules": "^0.1.0"
+    "build": "tsc -b && node ../../scripts/bundle-cli.mjs"
   }
 }
-
