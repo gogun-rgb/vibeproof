@@ -6,7 +6,7 @@ export type ScanStage =
   | "TARGET_VALIDATION"
   | "SOURCE_ACQUISITION"
   | "FILE_DISCOVERY"
-  | "PARALLEL_STATIC_SCAN"
+  | "STATIC_SCAN"
   | "EVIDENCE_AGGREGATION"
   | "DETERMINISTIC_SCORING"
   | "GPT_SECURITY_REVIEW"
@@ -177,4 +177,3 @@ export function evidenceAppearsInLine(maskedEvidence: string, line: string): boo
   const parts = maskedEvidence.split("***").filter((part) => part.length > 0);
   return parts.length > 0 && parts.every((part) => line.includes(part));
 }
-

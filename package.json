@@ -1,5 +1,5 @@
 {
-  "name": "vibeproof",
+  "name": "vibeproof-monorepo",
   "version": "0.1.0",
   "private": true,
   "description": "Scan before your AI runs it.",
@@ -22,7 +22,7 @@
     "typecheck": "tsc -b packages/rules packages/core packages/scanners packages/verifier packages/report packages/orchestrator packages/ai-providers packages/cli && npm run typecheck -w @vibeproof/web",
     "lint": "eslint .",
     "test": "vitest run packages apps/web --environment node --testTimeout 15000",
-    "build": "tsc -b packages/rules packages/core packages/scanners packages/verifier packages/report packages/orchestrator packages/ai-providers packages/cli && npm run build -w @vibeproof/web",
+    "build": "tsc -b packages/rules packages/core packages/scanners packages/verifier packages/report packages/orchestrator packages/ai-providers && npm run build -w vibeproof && npm run build -w @vibeproof/web",
     "test:e2e": "node scripts/run-e2e.mjs",
     "scan": "node packages/cli/dist/index.js scan",
     "rules": "node packages/cli/dist/index.js rules list",
@@ -39,6 +39,7 @@
     "@types/react-dom": "^19.0.2",
     "eslint": "^9.17.0",
     "eslint-config-next": "^16.2.9",
+    "esbuild": "^0.28.1",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.19.0",
     "vitest": "^3.2.6"

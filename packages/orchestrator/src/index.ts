@@ -106,7 +106,7 @@ export async function runScan(target: string, options: RunScanOptions = {}): Pro
     filesProcessed: files.length
   });
 
-  const scannerResults = await record("PARALLEL_STATIC_SCAN", async () => (options.scannerRunner ?? runStaticScanners)(files));
+  const scannerResults = await record("STATIC_SCAN", async () => (options.scannerRunner ?? runStaticScanners)(files));
   const findings = await record("EVIDENCE_AGGREGATION", async () => {
     const byId = new Map<string, Finding>();
     for (const result of scannerResults) {

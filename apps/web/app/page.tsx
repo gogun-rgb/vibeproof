@@ -27,7 +27,7 @@ type ScanResponse = {
 const stages = [
   "TARGET_VALIDATION",
   "SOURCE_ACQUISITION",
-  "PARALLEL_STATIC_SCAN",
+  "STATIC_SCAN",
   "DETERMINISTIC_SCORING",
   "CODE_VERIFICATION",
   "REPORT_GENERATION"
@@ -179,4 +179,3 @@ export default function Home() {
     </main>
   );
 }
-
