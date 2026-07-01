@@ -21,7 +21,7 @@
   "scripts": {
     "typecheck": "tsc -b packages/rules packages/core packages/scanners packages/verifier packages/report packages/orchestrator packages/ai-providers packages/cli && npm run typecheck -w @vibeproof/web",
     "lint": "eslint .",
-    "test": "vitest run --dir packages --environment node --testTimeout 15000",
+    "test": "vitest run packages apps/web --environment node --testTimeout 15000",
     "build": "tsc -b packages/rules packages/core packages/scanners packages/verifier packages/report packages/orchestrator packages/ai-providers packages/cli && npm run build -w @vibeproof/web",
     "test:e2e": "node scripts/run-e2e.mjs",
     "scan": "node packages/cli/dist/index.js scan",

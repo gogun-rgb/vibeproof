@@ -1,6 +1,8 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { runCli } from "../src/index";
+import { runScan } from "../../orchestrator/src/index";
+import { runStaticScanners } from "../../scanners/src/index";
 
 const fixturesRoot = path.resolve(process.cwd(), "fixtures");
 
@@ -57,6 +59,33 @@ describe("CLI", () => {
     const code = await runCli(["scan", "https://example.com/owner/repo"], capture.io);
     expect(code).toBe(3);
     expect(capture.stderr).toContain("Only https://github.com/owner/repo URLs are supported.");
+  });
+
+  it("returns internal error exit code when a scanner failed", async () => {
+    const capture = createIo();
+    const report = await runScan(path.join(fixturesRoot, "risky-postinstall"), {
+      scannerRunner: (files) => [
+        {
+          scannerId: "broken-scanner",
+          status: "failed",
+          findings: [],
+          errors: ["scanner exploded"],
+          filesScanned: files.length,
+          startedAt: new Date().toISOString(),
+          completedAt: new Date().toISOString()
+        },
+        ...runStaticScanners(files)
+      ]
+    });
+
+    const code = await runCli(["scan", path.join(fixturesRoot, "risky-postinstall")], capture.io, {
+      runScanImpl: async () => report
+    });
+
+    expect(code).toBe(3);
+    expect(capture.stdout).toContain("VibeProof Risk Report");
+    expect(capture.stdout).toContain("Verdict: BLOCK");
+    expect(capture.stderr).toContain("Scanner broken-scanner failed");
   });
 
   it("lists and explains rules", async () => {

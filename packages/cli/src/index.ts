@@ -3,7 +3,7 @@ import { pathToFileURL } from "node:url";
 import { runScan } from "@vibeproof/orchestrator";
 import { formatReport, type OutputFormat } from "@vibeproof/report";
 import { getRule, scanRules } from "@vibeproof/rules";
-import type { Verdict } from "@vibeproof/core";
+import type { ScanReport, Verdict } from "@vibeproof/core";
 
 interface CliIo {
   stdout: { write(message: string): void };
@@ -16,6 +16,10 @@ interface ScanArgs {
   explain: boolean;
   noAi: boolean;
   failOn?: "warn" | "block";
+}
+
+interface CliDeps {
+  runScanImpl?: typeof runScan;
 }
 
 function usage(): string {
@@ -79,7 +83,7 @@ function exitCodeForVerdict(verdict: Verdict, failOn?: "warn" | "block"): number
   return verdict === "WARN" ? 1 : 2;
 }
 
-export async function runCli(argv: string[], io: CliIo = process): Promise<number> {
+export async function runCli(argv: string[], io: CliIo = process, deps: CliDeps = {}): Promise<number> {
   try {
     const [command, subcommand, ...rest] = argv;
     if (!command || command === "--help" || command === "-h") {
@@ -89,7 +93,8 @@ export async function runCli(argv: string[], io: CliIo = process): Promise<numbe
 
     if (command === "scan") {
       const scanArgs = parseScanArgs([subcommand ?? "", ...rest]);
-      const report = await runScan(scanArgs.target, {
+      const scan = deps.runScanImpl ?? runScan;
+      const report: ScanReport = await scan(scanArgs.target, {
         explain: scanArgs.explain,
         noAi: scanArgs.noAi
       });
