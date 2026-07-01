@@ -17,12 +17,6 @@ updates:
           - "next"
           - "@next/*"
     ignore:
-      - dependency-name: "typescript"
-        update-types:
-          - "version-update:semver-major"
-      - dependency-name: "eslint"
-        update-types:
-          - "version-update:semver-major"
-      - dependency-name: "@eslint/js"
+      - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
