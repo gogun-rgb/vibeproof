@@ -2,11 +2,15 @@ import path from "node:path";
 import {
   STATIC_ONLY_NOTICE,
   createRunId,
+  maskSecretEvidence,
   type Finding,
   type ScanReport,
   type ScanStage,
+  type ScannerResult,
+  type SourceFile,
   type StageRecord,
-  type TargetType
+  type TargetType,
+  type ValidationError
 } from "@vibeproof/core";
 import { reviewFindingsWithGpt } from "@vibeproof/ai-providers";
 import { discoverGithubFiles, discoverLocalFiles, parseGithubUrl, runStaticScanners, scoreFindings } from "@vibeproof/scanners";
@@ -17,6 +21,25 @@ export interface RunScanOptions {
   noAi?: boolean;
   fetchImpl?: typeof fetch;
   githubToken?: string;
+  scannerRunner?: (files: SourceFile[]) => ScannerResult[];
+}
+
+function sanitizeScannerError(message: string): string {
+  return maskSecretEvidence(message)
+    .replace(/((?:api[_-]?key|token|secret|password)\s*[:=]\s*)\S+/gi, "$1***")
+    .slice(0, 240);
+}
+
+function scannerFailureErrors(scannerResults: ScannerResult[]): ValidationError[] {
+  return scannerResults
+    .filter((result) => result.status === "failed")
+    .flatMap((result) => {
+      const messages = result.errors.length > 0 ? result.errors : ["Unknown scanner failure."];
+      return messages.map((message) => ({
+        code: "SCANNER_EXECUTION_FAILED",
+        message: `Scanner ${result.scannerId} failed: ${sanitizeScannerError(message)}`
+      }));
+    });
 }
 
 export async function runScan(target: string, options: RunScanOptions = {}): Promise<ScanReport> {
@@ -83,7 +106,7 @@ export async function runScan(target: string, options: RunScanOptions = {}): Pro
     filesProcessed: files.length
   });
 
-  const scannerResults = await record("PARALLEL_STATIC_SCAN", async () => runStaticScanners(files));
+  const scannerResults = await record("PARALLEL_STATIC_SCAN", async () => (options.scannerRunner ?? runStaticScanners)(files));
   const findings = await record("EVIDENCE_AGGREGATION", async () => {
     const byId = new Map<string, Finding>();
     for (const result of scannerResults) {
@@ -121,7 +144,7 @@ export async function runScan(target: string, options: RunScanOptions = {}): Pro
   const validationErrors = await record("CODE_VERIFICATION", async () => {
     const findingVerification = verifyFindings(files, findings);
     const scoreVerification = verifyScore(findings, score);
-    return [...findingVerification.errors, ...scoreVerification.errors];
+    return [...scannerFailureErrors(scannerResults), ...findingVerification.errors, ...scoreVerification.errors];
   });
 
   return record("REPORT_GENERATION", async () => ({
@@ -141,4 +164,3 @@ export async function runScan(target: string, options: RunScanOptions = {}): Pro
     staticOnlyNotice: STATIC_ONLY_NOTICE
   }));
 }
-

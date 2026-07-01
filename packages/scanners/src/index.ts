@@ -316,22 +316,41 @@ function dependencyScanner(files: SourceFile[]): Finding[] {
   return findings;
 }
 
+const dangerousAgentPatterns = [
+  /ignore (all )?(previous|prior) instructions/i,
+  /(disable|skip|bypass).*(security|review|validation|checks?)/i,
+  /(print|reveal|expose).*(env|environment|secret|token|api key)/i,
+  /(run|execute).*(without|no).*(confirmation|asking|approval)/i,
+  /(download|curl|wget).*(and|then).*(run|execute|sh|bash|powershell)/i,
+  /(delete|remove).*(user files|home directory|all files)/i
+];
+
+const safeNegatedDangerPatterns = [
+  /\b(do not|don't|never|must not|should not|prohibit|forbid)\b.*\b(print|reveal|expose)\b.*\b(env|environment|secrets?|tokens?|api keys?|variables?)\b/i,
+  /\b(do not|don't|never|must not|should not|prohibit|forbid)\b.*\b(disable|skip|bypass)\b.*\b(security|review|validation|checks?)\b/i,
+  /\b(do not|don't|never|must not|should not|prohibit|forbid)\b.*\b(run|execute)\b.*\b(without|no)\b.*\b(confirmation|asking|approval)\b/i,
+  /\b(do not|don't|never|must not|should not|prohibit|forbid)\b.*\b(download|curl|wget)\b.*\b(and|then)\b.*\b(run|execute|sh|bash|powershell)\b/i
+];
+
+const safetyProcedureBanPatterns = [
+  /\b(do not|don't|never|must not|should not|prohibit|forbid)\b.*\b(ask|wait)\b.*\b(confirmation|approval)\b/i,
+  /\b(do not|don't|never|must not|should not|prohibit|forbid)\b.*\b(perform|do|run)\b.*\b(security review|security check|validation|checks?)\b/i,
+  /\b(do not|don't|never|must not|should not|prohibit|forbid)\b.*\b(show|tell|notify|inform)\b.*\b(user|instruction)\b/i
+];
+
+export function isDangerousAgentInstruction(line: string): boolean {
+  const trimmed = line.trim();
+  if (!trimmed || safeNegatedDangerPatterns.some((pattern) => pattern.test(trimmed))) {
+    return false;
+  }
+  return safetyProcedureBanPatterns.some((pattern) => pattern.test(trimmed)) || dangerousAgentPatterns.some((pattern) => pattern.test(trimmed));
+}
+
 function agentInstructionScanner(files: SourceFile[]): Finding[] {
-  const patterns = [
-    /ignore (all )?(previous|prior) instructions/i,
-    /(disable|skip|bypass).*(security|review|validation|checks?)/i,
-    /(print|reveal|expose).*(env|environment|secret|token|api key)/i,
-    /(run|execute).*(without|no).*(confirmation|asking|approval)/i,
-    /(download|curl|wget).*(and|then).*(run|execute|sh|bash|powershell)/i,
-    /(delete|remove).*(user files|home directory|all files)/i
-  ];
   const findings: Finding[] = [];
   for (const file of files.filter((candidate) => isAgentInstructionFile(candidate.path))) {
     for (const line of splitLines(file.content)) {
-      if (/\b(do not|don't|never|must not|should not|prohibit|forbid)\b/i.test(line)) {
-        continue;
-      }
-      if (patterns.some((pattern) => pattern.test(line))) {
+      if (isDangerousAgentInstruction(line)) {
         findings.push(findingForNeedle("AGENT_DANGEROUS_INSTRUCTION_HIGH", file, line.trim().slice(0, 40)));
       }
     }

@@ -1,6 +1,7 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { runScan } from "../src/index";
+import { runStaticScanners } from "@vibeproof/scanners";
 
 const fixturesRoot = path.resolve(process.cwd(), "fixtures");
 
@@ -56,5 +57,28 @@ describe("runScan", () => {
         delete process.env.OPENAI_API_KEY;
       }
     }
+  });
+
+  it("keeps findings but reports validation errors when a scanner fails", async () => {
+    const report = await runScan(path.join(fixturesRoot, "risky-postinstall"), {
+      scannerRunner: (files) => [
+        {
+          scannerId: "broken-scanner",
+          status: "failed",
+          findings: [],
+          errors: ["scanner exploded with token=abcdef1234567890SECRET"],
+          filesScanned: files.length,
+          startedAt: new Date().toISOString(),
+          completedAt: new Date().toISOString()
+        },
+        ...runStaticScanners(files)
+      ]
+    });
+
+    expect(report.findings.map((finding) => finding.ruleId)).toContain("SCRIPT_REMOTE_EXEC_CRITICAL");
+    expect(report.scannerResults[0].status).toBe("failed");
+    expect(report.validationErrors.map((error) => error.code)).toContain("SCANNER_EXECUTION_FAILED");
+    expect(report.validationErrors[0].message).toContain("broken-scanner");
+    expect(report.validationErrors[0].message).not.toContain("abcdef1234567890SECRET");
   });
 });
