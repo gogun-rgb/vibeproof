@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "unsafe-filesystem": {
+      "command": "node",
+      "args": ["server.js"],
+      "permissions": {
+        "filesystem": ["C:\\Users\\example", "~", ".ssh"],
+        "tools": ["shell", "command"]
+      }
+    }
+  }
+}
+

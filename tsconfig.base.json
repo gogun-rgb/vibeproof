@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "declaration": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@vibeproof/ai-providers": ["packages/ai-providers/src/index.ts"],
+      "@vibeproof/cli": ["packages/cli/src/index.ts"],
+      "@vibeproof/core": ["packages/core/src/index.ts"],
+      "@vibeproof/orchestrator": ["packages/orchestrator/src/index.ts"],
+      "@vibeproof/report": ["packages/report/src/index.ts"],
+      "@vibeproof/rules": ["packages/rules/src/index.ts"],
+      "@vibeproof/scanners": ["packages/scanners/src/index.ts"],
+      "@vibeproof/verifier": ["packages/verifier/src/index.ts"]
+    }
+  }
+}
+

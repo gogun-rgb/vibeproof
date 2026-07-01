@@ -1,0 +1,49 @@
+{
+  "name": "vibeproof",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Scan before your AI runs it.",
+  "type": "module",
+  "bin": {
+    "vibeproof": "packages/cli/dist/index.js"
+  },
+  "workspaces": [
+    "apps/web",
+    "packages/ai-providers",
+    "packages/cli",
+    "packages/core",
+    "packages/orchestrator",
+    "packages/report",
+    "packages/rules",
+    "packages/scanners",
+    "packages/verifier"
+  ],
+  "scripts": {
+    "typecheck": "tsc -b packages/rules packages/core packages/scanners packages/verifier packages/report packages/orchestrator packages/ai-providers packages/cli && npm run typecheck -w @vibeproof/web",
+    "lint": "eslint .",
+    "test": "vitest run --dir packages --environment node --testTimeout 15000",
+    "build": "tsc -b packages/rules packages/core packages/scanners packages/verifier packages/report packages/orchestrator packages/ai-providers packages/cli && npm run build -w @vibeproof/web",
+    "test:e2e": "node scripts/run-e2e.mjs",
+    "scan": "node packages/cli/dist/index.js scan",
+    "rules": "node packages/cli/dist/index.js rules list",
+    "explain": "node packages/cli/dist/index.js explain",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run build && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.17.0",
+    "@next/eslint-plugin-next": "^16.2.9",
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^16.2.9",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.0",
+    "vitest": "^3.2.6"
+  },
+  "overrides": {
+    "postcss": "8.5.10"
+  }
+}
