@@ -120,8 +120,17 @@ describe("static scanners", () => {
   });
 
   it("masks secret-like evidence", async () => {
-    const files = await discoverLocalFiles(path.join(fixturesRoot, "risky-secret"));
-    const findings = allFindings(runStaticScanners(files));
+    const secretLikeValue = ["sk-test1234567890", "abcdefSECRET"].join("");
+    const findings = allFindings(
+      runStaticScanners([
+        {
+          path: "README.md",
+          content: `OPENAI_API_KEY=${secretLikeValue}`,
+          size: 40,
+          source: "local"
+        }
+      ])
+    );
     const secretFinding = findings.find((finding) => finding.ruleId === "SECRET_EXPOSED_CRITICAL");
     expect(secretFinding?.evidence).toContain("***");
     expect(secretFinding?.evidence).not.toContain("abcdefSECRET");

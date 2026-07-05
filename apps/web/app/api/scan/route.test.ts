@@ -78,4 +78,26 @@ describe("scan route", () => {
     expect(response.status).toBe(400);
     expect(body.error).toContain("public https://github.com/owner/repo URLs");
   });
+
+  it("rejects non-json requests", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/scan", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: "https://github.com/acme/risky-demo"
+      })
+    );
+    const body = (await response.json()) as { error: string };
+
+    expect(response.status).toBe(415);
+    expect(body.error).toContain("application/json");
+  });
+
+  it("rejects oversized targets before scanning", async () => {
+    const response = await POST(requestFor(`https://github.com/acme/${"r".repeat(400)}`));
+    const body = (await response.json()) as { error: string };
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe("Target is required.");
+  });
 });
