@@ -70,6 +70,7 @@ Level 3 should use a different model family or provider when available. When gen
 - Preserve raw traces for failures, sampled successes, high-risk changes, reviewer disagreement, and harness-evolution experiments.
 - Trace planning, routing, tool execution, patch application, verification, and review outcomes as auditable events when they affect trust decisions.
 - Do not create a second trust or scoring control plane. One capability should have one canonical mechanism.
+- Add specialized agent configs, hooks, skills, subagents, or setup workflows only when recorded traces show a repeated task class or failure class they uniquely reduce; otherwise keep the canonical repository instructions and focused verification loop as the default harness.
 
 ## Scope boundaries
 
