@@ -27,6 +27,29 @@ VibeProof is maintained by AI-first coding agents. Work should stay small, evide
 - Do not weaken tests, hide failures, delete failing checks, or report a failing command as successful.
 - Do not use destructive Git commands such as `git reset --hard`, `git checkout --`, or `git clean -fd`.
 - Commit, push, and open or merge PRs only after real verification passes.
+- Ordinary technical implementation decisions remain autonomous when protected product surfaces are not implicated.
+
+## Product Boundary
+
+Semantic-change suspicion is judged only by the dedicated Product Boundary Critic. The Governor may coordinate work, but is not the semantic-change decision owner. File paths, keywords, and protected-surface metadata may trigger inspection, but they are not final semantic-change authority.
+
+A deterministic protected-surface trigger must invoke the Product Boundary Critic when a change may affect product identity, target user, core problem, user-visible semantics, public API behavior, canonical terminology, trust semantics, verdict semantics, supported targets, explicit non-goals, or business model.
+
+The Product Boundary Critic must cite concrete changed-file or diff evidence and emit exactly one result:
+
+- `NO_SEMANTIC_CHANGE`
+- `SEMANTIC_CHANGE_SUSPECTED`
+- `UNKNOWN`
+
+`SEMANTIC_CHANGE_SUSPECTED` and `UNKNOWN` require escalation.
+
+## Review Promotion
+
+Fresh-Context Critic review provides contextual separation only; do not claim that a different session proves cognitive independence. Reviewer provenance must record session, model identity, model family or provider, and context exposure. Prefer evidence-based mechanical checks over prose agreement.
+
+Promotion from Level 2 Fresh-Context Critic to Level 3 Diverse Challenger is automatic and Governor-independent when any observable condition holds: high-risk task classification, reviewer disagreement, reviewer result is `UNKNOWN`, a novel architecture marker is recorded for the task, the same finding fingerprint is repeatedly remediated with no material progress, or deterministic calibration sampling selects the task.
+
+Level 3 should use a different model family or provider when available. When genuine model diversity is unavailable, record `DIVERSITY_UNAVAILABLE`; do not simulate diversity by spawning additional same-model reviewers and describing them as independent or diverse.
 
 ## Trust and review rules
 
