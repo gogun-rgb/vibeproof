@@ -71,6 +71,7 @@ Level 3 should use a different model family or provider when available. When gen
 - Trace planning, routing, tool execution, patch application, verification, and review outcomes as auditable events when they affect trust decisions.
 - Do not create a second trust or scoring control plane. One capability should have one canonical mechanism.
 - Add specialized agent configs, hooks, skills, subagents, or setup workflows only when recorded traces show a repeated task class or failure class they uniquely reduce; otherwise keep the canonical repository instructions and focused verification loop as the default harness.
+- Treat setup workflows, preflight hooks, and environment bootstrapping as convenience scaffolding, not trust gates. If they fail, are skipped, or are unavailable, require focused verification evidence or report missing evidence instead of treating the task as verified.
 
 ## Scope boundaries
 
